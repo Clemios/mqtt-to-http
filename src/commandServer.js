@@ -1,6 +1,7 @@
 const http = require('http');
 const mqtt = require('mqtt');
 const logger = require('./logger');
+const { saveDeviceState } = require('./deviceStateStore');
 
 /**
  * Minimal HTTP server that converts POST /command requests into MQTT publishes.
@@ -29,6 +30,7 @@ function createCommandServer(config) {
 
   const port = serverConfig.port || 3000;
   const authToken = serverConfig.authToken || null;
+  const corsOrigin = serverConfig.corsOrigin || '*';
 
   const mqttPort = config.mqtt?.port || 1883;
   const mqttClient = mqtt.connect(`mqtt://localhost:${mqttPort}`, {
@@ -54,11 +56,25 @@ function createCommandServer(config) {
     res.writeHead(status, {
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(payload),
+      'Access-Control-Allow-Origin': corsOrigin,
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     });
     res.end(payload);
   }
 
   const server = http.createServer((req, res) => {
+    if (req.method === 'OPTIONS' && req.url === '/command') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': corsOrigin,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400',
+      });
+      res.end();
+      return;
+    }
+
     if (req.method !== 'POST' || req.url !== '/command') {
       send(res, 404, { error: 'Not found. Use POST /command' });
       return;
@@ -102,6 +118,7 @@ function createCommandServer(config) {
           logger.error({ topic, err: err.message }, 'HTTP command server failed to publish to MQTT');
           send(res, 500, { error: 'Failed to publish to MQTT broker' });
         } else {
+          saveDeviceState(config, topic, payload, 'http').catch(() => {});
           logger.info({ topic }, 'Command published via HTTP');
           send(res, 200, { success: true, topic });
         }

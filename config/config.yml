@@ -53,6 +53,9 @@ firebaseRtdb:
     # Latest device status keyed by topic under "devices/status"
     - topic: "devices/+/status"
       path: "devices/status"
+    # LED command state keyed by topic under "device_state"
+    - topic: "devices/+/led"
+      path: "device_state"
 
 # ── Reverse path: Cloud → MQTT → ESP devices ─────────────────────────────────
 

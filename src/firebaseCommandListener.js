@@ -2,6 +2,7 @@ const path = require('path');
 const mqtt = require('mqtt');
 const admin = require('firebase-admin');
 const logger = require('./logger');
+const { saveDeviceState } = require('./deviceStateStore');
 
 /**
  * Initialize a named Firebase app for the command listener.
@@ -43,7 +44,7 @@ function initRtdb(listenerConfig) {
  * - Publishes to the local MQTT broker
  * - Updates status to 'sent' or 'failed' in RTDB
  */
-function processCommand(snapshot, mqttClient) {
+function processCommand(snapshot, mqttClient, config) {
   const commandId = snapshot.key;
   const command = snapshot.val();
 
@@ -71,6 +72,7 @@ function processCommand(snapshot, mqttClient) {
       if (err) {
         logger.error({ commandId, topic, err: err.message }, 'Failed to publish command to MQTT');
       } else {
+        saveDeviceState(config, topic, payload, 'firebase').catch(() => {});
         logger.info({ commandId, topic }, 'Command published to MQTT');
       }
     });
@@ -123,7 +125,7 @@ function createFirebaseCommandListener(config) {
     // child_added fires for each document present at startup and for every new push().
     // Commands are removed from RTDB immediately after processing, so there is no
     // risk of re-processing on restart and no index is needed.
-    db.ref(listenPath).on('child_added', (snapshot) => processCommand(snapshot, mqttClient));
+    db.ref(listenPath).on('child_added', (snapshot) => processCommand(snapshot, mqttClient, config));
 
     logger.info({ listenPath }, 'Listening for Firebase commands on RTDB');
   });
