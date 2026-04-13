@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INSTALL_DIR="/opt/mqtt-to-http"
 SERVICE_NAME="mqtt-to-http"
 NODE_VERSION="20"
@@ -42,7 +43,7 @@ npm ci --omit=dev
 
 # Install and enable systemd service
 echo "==> Installing systemd service"
-sudo cp "$(dirname "$0")/${SERVICE_NAME}.service" "/etc/systemd/system/${SERVICE_NAME}.service"
+sudo cp "${SCRIPT_DIR}/${SERVICE_NAME}.service" "/etc/systemd/system/${SERVICE_NAME}.service"
 sudo systemctl daemon-reload
 sudo systemctl enable "$SERVICE_NAME"
 sudo systemctl restart "$SERVICE_NAME"
