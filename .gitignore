@@ -1,4 +1,4 @@
 node_modules/
-config/serviceAccount.json
 .env
 *.log
+config/serviceAccount.json
