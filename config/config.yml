@@ -27,3 +27,16 @@ bridge:
       method: POST
       headers:
         Authorization: "Bearer ${API_TOKEN}"
+
+firebase:
+  # Optional: path to a service account JSON file for authentication.
+  # If omitted, Application Default Credentials (ADC) are used instead
+  # (set GOOGLE_APPLICATION_CREDENTIALS env var to your service account file).
+  serviceAccountPath: "./config/serviceAccount.json"
+  routes:
+    # All sensor messages → "sensor_data" Firestore collection
+    - topic: "sensors/#"
+      collection: "sensor_data"
+    # Device status messages → "device_status" collection
+    - topic: "devices/+/status"
+      collection: "device_status"

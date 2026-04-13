@@ -4,12 +4,14 @@ const { createBroker } = require('./broker');
 const { createBridge } = require('./bridge');
 const config = require('./config');
 const logger = require('./logger');
+const { createFirebaseBridge } = require('./firebase');
 
 async function main() {
   logger.info('Starting MQTT-to-HTTP gateway');
 
   await createBroker(config);
-  createBridge(config);
+  // createBridge(config);
+  createFirebaseBridge(config)
 }
 
 main().catch((err) => {
