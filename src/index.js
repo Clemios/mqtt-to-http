@@ -6,6 +6,8 @@ const config = require('./config');
 const logger = require('./logger');
 const { createFirebaseBridge } = require('./firebase');
 const { createFirebaseRtdbBridge } = require('./firebaseRtdb');
+const { createFirebaseCommandListener } = require('./firebaseCommandListener');
+const { createCommandServer } = require('./commandServer');
 
 async function main() {
   logger.info('Starting MQTT-to-HTTP gateway');
@@ -14,6 +16,10 @@ async function main() {
   // createBridge(config);
   createFirebaseBridge(config);
   createFirebaseRtdbBridge(config);
+
+  // Reverse path: Firebase / HTTP → MQTT → ESP devices
+  createFirebaseCommandListener(config);
+  createCommandServer(config);
 }
 
 main().catch((err) => {

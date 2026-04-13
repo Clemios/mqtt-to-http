@@ -53,3 +53,29 @@ firebaseRtdb:
     # Latest device status keyed by topic under "devices/status"
     - topic: "devices/+/status"
       path: "devices/status"
+
+# ── Reverse path: Cloud → MQTT → ESP devices ─────────────────────────────────
+
+# Firebase RTDB command listener
+# Watches the "commands" path for new documents and forwards them to MQTT.
+# Write a command from any Firebase client (web, mobile, Cloud Function):
+#   db.ref("commands").push({
+#     topic: "devices/esp1/led",
+#     payload: { action: "on" }
+#   });
+# The gateway deletes the document from RTDB as soon as it is processed.
+commandListener:
+  serviceAccountPath: "./config/serviceAccount.json"
+  databaseURL: "https://iot-ynov-toulouse-default-rtdb.europe-west1.firebasedatabase.app"
+  path: "commands"   # RTDB path to watch for incoming commands
+
+# HTTP command server
+# Accepts POST /command and publishes to MQTT.
+# curl -X POST http://gateway-ip:3000/command \
+#   -H "Content-Type: application/json" \
+#   -H "Authorization: Bearer ${COMMAND_SERVER_TOKEN}" \
+#   -d '{"topic":"devices/esp1/led","payload":{"action":"on"}}'
+commandServer:
+  port: 3000
+  # Optional bearer token — omit to disable auth
+  authToken: "${COMMAND_SERVER_TOKEN}"

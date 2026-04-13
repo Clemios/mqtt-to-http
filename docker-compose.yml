@@ -4,6 +4,7 @@ services:
     ports:
       - "1883:1883"   # MQTT TCP
       - "9001:9001"   # MQTT WebSocket (optional)
+      - "3000:3000"   # HTTP command server
     volumes:
       - ./config:/app/config:ro
       - ./.env:/app/.env:ro
