@@ -1,0 +1,29 @@
+mqtt:
+  port: 1883
+  # Uncomment to enable WebSocket transport (useful for browser-based clients)
+  # websocket_port: 9001
+
+bridge:
+  routes:
+    # Exact topic match
+    - topic: "sensors/temperature"
+      url: "https://your-api.example.com/ingest/temperature"
+      method: POST
+      headers:
+        Authorization: "Bearer ${API_TOKEN}"
+      timeout: 10000
+
+    # Single-level wildcard: matches sensors/room1/humidity, sensors/kitchen/humidity, etc.
+    - topic: "sensors/+/humidity"
+      url: "https://your-api.example.com/ingest/humidity"
+      method: POST
+      headers:
+        Authorization: "Bearer ${API_TOKEN}"
+        X-Device-ID: "${DEVICE_ID}"
+
+    # Multi-level wildcard: matches devices/any/number/of/levels
+    - topic: "devices/#"
+      url: "https://your-api.example.com/ingest/devices"
+      method: POST
+      headers:
+        Authorization: "Bearer ${API_TOKEN}"

@@ -1,0 +1,18 @@
+[Unit]
+Description=MQTT to HTTP Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/mqtt-to-http
+EnvironmentFile=/opt/mqtt-to-http/.env
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+services:
+  gateway:
+    build: .
+    ports:
+      - "1883:1883"   # MQTT TCP
+      - "9001:9001"   # MQTT WebSocket (optional)
+    volumes:
+      - ./config:/app/config:ro
+      - ./.env:/app/.env:ro
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    restart: unless-stopped
