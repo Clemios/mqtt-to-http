@@ -5,13 +5,15 @@ const { createBridge } = require('./bridge');
 const config = require('./config');
 const logger = require('./logger');
 const { createFirebaseBridge } = require('./firebase');
+const { createFirebaseRtdbBridge } = require('./firebaseRtdb');
 
 async function main() {
   logger.info('Starting MQTT-to-HTTP gateway');
 
   await createBroker(config);
   // createBridge(config);
-  createFirebaseBridge(config)
+  createFirebaseBridge(config);
+  createFirebaseRtdbBridge(config);
 }
 
 main().catch((err) => {

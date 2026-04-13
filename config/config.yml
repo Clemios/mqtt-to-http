@@ -40,3 +40,16 @@ firebase:
     # Device status messages → "device_status" collection
     - topic: "devices/+/status"
       collection: "device_status"
+
+# Speed layer — Firebase Realtime Database (low-latency, latest-value writes)
+firebaseRtdb:
+  serviceAccountPath: "./config/serviceAccount.json"
+  # Replace with your actual Realtime Database URL
+  databaseURL: "https://iot-ynov-toulouse-default-rtdb.europe-west1.firebasedatabase.app"
+  routes:
+    # Latest sensor readings keyed by topic under "sensors/latest"
+    - topic: "sensors/#"
+      path: "sensors/latest"
+    # Latest device status keyed by topic under "devices/status"
+    - topic: "devices/+/status"
+      path: "devices/status"
